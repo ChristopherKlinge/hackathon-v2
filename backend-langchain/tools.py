@@ -38,29 +38,98 @@ def get_db_info() -> str:
 def get_machine_data(
     from_timestamp: str | None,
     to_timestamp: str | None,
-) -> List[float]:
+    min_comb_op_tmp_1: int = 0,
+    max_comb_op_tmp_1: int = 200,
+    min_comb_op_tmp_2: int = 0,
+    max_comb_op_tmp_2: int = 200,
+    min_comb_op_tmp_3: int = 0,
+    max_comb_op_tmp_3: int = 200,
+    min_material_pressure: int = 0,
+    max_material_pressure: int = 1000,
+    min_material_temperature: int = 0,
+    max_material_temperature: int = 200,
+    min_motor_rpm: int = 0,
+    max_motor_rpm: int = 3000,
+) -> str:
     """
-    ### Description of the function
-    ### IMPORTANT! The LLM decides to call it or not based on this docstring!
+    This function can be used to get data of machine 1 for a given timespan.
+
+    For each column in the machine table, there exists a min and a max parameter to filter values.
+
+    You can filter by time using the parameters from_timestamp and to_timestamp. All timestamps are in UTC.
 
     Args:
-        from_timestamp (str | None): ...
-        to_timestamp (str | None): ...
+        from_timestamp (str | None): Start timestamp for filtering (format: %Y-%m-%d %H:%M:%S)
+        to_timestamp (str | None): End timestamp for filtering (format: %Y-%m-%d %H:%M:%S)
 
     Returns:
-        List[float]: ...
+        str: A list containing a dict for every sample. Each dict contains the keys combiner_operation_temperature_1, combiner_operation_temperature_2, combiner_operation_temperature_3, id, material_pressure, material_temperature, motor_rpm and time_stamp.
     """
 
-    # Prepare the URL to call the Factory's API (Note: use config.BACKEND_URL)
-    pass
-
     # Send the request to get the data from the machine endpoint
-    pass
+    results = requests.get(config.BACKEND_URL + "/machine", params={
+        'from_ts': from_timestamp,
+        'to_ts': to_timestamp,
+        'min_comb_op_tmp_1': min_comb_op_tmp_1,
+        'max_comb_op_tmp_1': max_comb_op_tmp_1,
+        'min_comb_op_tmp_2': min_comb_op_tmp_2,
+        'max_comb_op_tmp_2': max_comb_op_tmp_2,
+        'min_comb_op_tmp_3': min_comb_op_tmp_3,
+        'max_comb_op_tmp_3': max_comb_op_tmp_3,
+        'min_material_pressure': min_material_pressure,
+        'max_material_pressure': max_material_pressure,
+        'min_material_temperature': min_material_temperature,
+        'max_material_temperature': max_material_temperature,
+        'min_motor_rpm': min_motor_rpm,
+        'max_motor_rpm': max_motor_rpm,
+    })
 
-    # Optional: Postprocess the data to be in your desired format
-    pass
+    print(results.text)
 
-    return []
+    return results.text
+
+
+@tool
+def get_ambient(
+    from_timestamp: str | None,
+    to_timestamp: str | None,
+    min_value_humidity: int = 0,
+    max_value_humidity: int = 100,
+    min_value_amb_temperature: int = 0,
+    max_value_amb_temperature: int = 100,
+    min_value_zone_1_temperature: int = 0,
+    max_value_zone_1_temperature: int = 100,
+) -> str:
+    """
+    This function can be used to get ambient data of the machine floor for a given timespan.  
+
+    For each column in the ambient table, there exists a min and a max parameter to filter values.
+
+    You can filter by time using the parameters from_timestamp and to_timestamp. All timestamps are in UTC.
+
+    Args:
+        from_timestamp (str | None): Start timestamp for filtering (format: %Y-%m-%d %H:%M:%S)
+        to_timestamp (str | None): End timestamp for filtering (format: %Y-%m-%d %H:%M:%S)
+
+    Returns:
+        str: A list containing a dict for every sample. Each dict contains the keys ambient_humidity, ambient_temperature, id, time_stamp and zone_1_temperature.
+    """
+
+    # Send the request to get the data from the ambient endpoint
+    results = requests.get(config.BACKEND_URL + "/ambient", params={
+        'from_ts': from_timestamp,
+        'to_ts': to_timestamp,
+        'min_value_humidity': min_value_humidity,
+        'max_value_humidity': max_value_humidity,
+        'min_value_amb_temperature': min_value_amb_temperature,
+        'max_value_amb_temperature': max_value_amb_temperature,
+        'min_value_zone_1_temperature': min_value_zone_1_temperature,
+        'max_value_zone_1_temperature': max_value_zone_1_temperature,
+    })
+
+    print(results.text)
+
+    return results.text
 
 
 # Question: Do you need to invoke the API Endpoints for the other tables as well? (input, ambient, qa)
@@ -68,33 +137,22 @@ def get_machine_data(
 
 ### TASK 2: QUERY LOGS-API-ENDPOINT ###
 
-
 @tool
-def get_logs(
-    from_timestamp: str | None, to_timestamp: str | None
-) -> List[Dict[str, str]]:
+def get_logs() -> str:
     """
-    ### Description of the function
-    ### IMPORTANT! The LLM decides to call it or not based on this docstring!
+    Returns error messages for machine 1. The result is a list of dictionaries containing an id, message and timestamp.
 
-    Args:
-        from_timestamp (str | None): ...
-        to_timestamp (str | None): ...
+    All timestamps are in UTC.
 
     Returns:
         List[Dict[str, str]]: ...
     """
 
-    # Prepare the URL to call the Factory's API
-    pass
+    results = requests.get(config.BACKEND_URL + "/logs")
 
-    # Send the request to get the data from the logs endpoint
-    pass
+    print(results.text)
 
-    # Optional: Postprocess the data to be in your desired format
-    pass
-
-    return []
+    return results.text
 
 
 ### TASK 3: QUERY DOCUMENTATION USING RAG ###

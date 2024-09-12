@@ -1,6 +1,6 @@
 import config
 from typing import List, Any
-from tools import get_db_info
+from tools import get_db_info, get_ambient, get_machine_data, get_logs
 from dotenv import find_dotenv, load_dotenv
 from datetime import datetime
 
@@ -19,7 +19,7 @@ class Agent:
         llm = ChatOpenAI(name=config.GPT_VERSION, temperature=config.TEMPERATURE)
 
         # Define the List of Tools, that the Agent should have Access to
-        tools = [get_db_info]
+        tools = [get_db_info, get_machine_data, get_ambient, get_logs]
 
         # Define the Prompt Template for the Agent --> nothing special here...
         prompt = ChatPromptTemplate.from_messages(
